@@ -1,0 +1,28 @@
+services:
+  gocore-core:
+    container_name: gocore-core
+    build:
+      context: https://github.com/core-coin/go-core.git
+      dockerfile: Dockerfile
+      network: host
+      args:
+        NETWORK: mainnet
+        CHAINDIR: ./core/mainnet
+        SYNCMODE: full
+        GCMODE: full
+        # Expose ports inside the container
+        EXPOSEPORTS: 30300 30300/udp
+    # Expose ports outside the server
+    ports:
+      - "8545:8545/tcp" # HTTP-RPC
+      - "8546:8546/tcp" # WS
+      # - "8547:8547/tcp" # GraphQL
+      - "30300:30300/tcp"
+      - "30300:30300/udp"
+    volumes:
+      - ./core/core-coin:/root
+      - ./core/home:/home
+    entrypoint: "sh ./usr/local/bin/gocore"
+    deploy:
+      restart_policy:
+        condition: always
